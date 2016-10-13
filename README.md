@@ -41,3 +41,13 @@ Some code taken and inspiration taken from https://github.com/viniciusban/web2py
 ## Licence
 
 To be defined, but probably something like MIT… 
+
+## TODO
+
+- separate things in a clean independent pytest plugin (obiously with some
+  more configuration w.r.t. web2py and applicatins paths),
+- write tests for the pytest-plugin,
+- document pytest usage,
+- document test writing (with pitfalls of unittest, use of mocks, …),
+- writing more web2py default tests,
+- …
