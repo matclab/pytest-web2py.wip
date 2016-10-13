@@ -1,0 +1,16 @@
+.pytest-incremental
+.coverage
+*.pyc
+*.sw[poqr]
+*.pyo
+*~
+#*
+*.1
+*.bak
+*.bak2
+*.svn
+*.w2p
+*.class
+*.rej
+*.orig
+*.gz
