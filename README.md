@@ -1,8 +1,8 @@
-= Pytest Plugin for Web2py
+# Pytest Plugin for Web2py
 
 This repo is a work in progress for building a pytest plugin for web2py.
 
-== State and Goal
+## State and Goal
 
 For now, pytest works, but one shall put the conftest files in the
 application directory.
@@ -10,7 +10,7 @@ application directory.
 The goal is to produce a fully independent pytest plugin.
 
 
-== Usage
+## Usage
 
 Install requirements (preferably in a virtualenv):
 ```
@@ -29,15 +29,15 @@ py.test web-tests
 py.test --splinter-all ui-tests
 ```
 
-== Writing Tests
+## Writing Tests
 
 `TODO`
 
-== Thanks
+## Thanks
 
 Some code taken and inspiration taken from https://github.com/viniciusban/web2py.test
 
 
-== Licence
+## Licence
 
 To be defined, but probably something like MIT… 
