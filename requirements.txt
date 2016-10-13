@@ -1,0 +1,14 @@
+beautifulsoup4==4.5.1
+lxml==3.6.1
+mock==2.0.0
+py==1.4.31
+pytest==3.0.2
+pytest-cov==2.3.0
+pytest-describe==0.10.3
+pytest-mock==1.2
+pytest-splinter==1.7.6
+pytest-stepwise==0.4
+pytest-tblineinfo==0.4
+selenium==2.53.6
+splinter==0.7.4
+xvfbwrapper==0.2.8
