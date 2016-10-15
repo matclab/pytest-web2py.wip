@@ -130,7 +130,7 @@ def gaebed(gae, gae_sdk_path, gae_probability, mocker):
             pass
 
         mocker.patch('google.appengine.api.mail.send_mail', autospec=True)
-        APP_ID = 'lostre-test-1637'
+        APP_ID = 'GAE.APP.ID'
         os.environ['APPLICATION_ID'] = APP_ID
         from google.appengine.api import apiproxy_stub_map, datastore_file_stub
         from google.appengine.datastore import datastore_stub_util
