@@ -44,6 +44,7 @@ To be defined, but probably something like MIT…
 
 ## TODO
 
+- make the API cleaner
 - separate things in a clean independent pytest plugin (obiously with some
   more configuration w.r.t. web2py and applicatins paths),
 - write tests for the pytest-plugin,
