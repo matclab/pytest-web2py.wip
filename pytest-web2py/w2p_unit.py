@@ -1,66 +1,21 @@
 # -*- coding: utf-8 -*-
-'''
-py.test configuration and fixtures file.
-
-This file is lightly adapted from the one by viniciusban;
-Part of the web2py.test model app (https://github.com/viniciusban/web2py.test)
-
-This file
-- Tells application it's running in a test environment.
-- Creates a complete web2py environment, similar to web2py shell.
-- Creates a WebClient instance to browse your application, similar to a real
-web browser.
-- Propagates some application data to test cases via fixtures, like baseurl
-and automatic appname discovery.
-
-To write to db in test:
-
-web2py.db.table.insert(**data)
-web2py.db.commit()
-
-To run tests:
-
-cd web2py (you must be in the application root directory to run tests)
-python web2py.py -a my_password --nogui &
-py.test -x [-l] [-q|-v] -s unit-tests
-
-'''
 
 import logging
 import os
 import sys
 from copy import copy
 
-import hypothesis.strategies as st
 import pytest
-from faker import Factory
-from hypothesis import find
-from hypothesis.extra.fakefactory import fake_factory
 
 logger = logging.getLogger("web2py.test")
 logger.setLevel(logging.DEBUG)
 
-fake = Factory.create()
-
-# allow imports from modules and site-packages
-dirs = os.path.split(__file__)[0]
-appname = dirs.split(os.path.sep)[-2]
-app_directory = os.path.join('/', *dirs.split(os.path.sep)[:-1])
-sys.path.insert(0, os.path.join(app_directory, 'modules'))
-sys.path.insert(0, '../..')
 
 
 
 @pytest.fixture
 def is_https():
     return True
-
-
-@pytest.fixture
-def appdir():
-    return app_directory
-
-
 
 
 
@@ -72,6 +27,11 @@ def prepare_db(w):
         pass
 
     return _prepare_db
+
+@pytest.fixture()
+def do_not_clean():
+    """ list of table names that shall not be erased before every tests """
+    return []
 
 
 @pytest.fixture(autouse=True)
