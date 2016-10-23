@@ -1,6 +1,7 @@
 .pytest-incremental
 .coverage
 *.pyc
+__pycache__
 *.sw[poqr]
 *.pyo
 *~

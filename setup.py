@@ -8,6 +8,7 @@ import codecs
 
 setup(
     name="pytest-web2py",
+    packages=["pytest_web2py"],
     version = "0.1",
     description = (
         'pytest-web2py is a py.test plugin that allows for web2py application '
@@ -18,7 +19,7 @@ setup(
     author_email = 'mathieu@antipodae.fr, mathieu@clabaut.net',
     py_modules=['pytest_web2py'],
     # the following makes a plugin available to pytest
-    entry_points={'pytest11': ['web2py = pytest_web2py']},
+    entry_points={'pytest11': ['web2py = pytest_web2py.plugin']},
     platforms='any',
     install_requires=[
                 'pytest>=3.0',
@@ -27,10 +28,12 @@ setup(
                 'mock>=2.0.0',
                 'pytest-describe>=0.10.3',
                 'pytest-mock>=1.2',
-                'pytest-splinterr>=1.7.6',
+                'pytest-splinter>=1.7.6',
                 'selenium>=2.53.6',
                 'splinter>=0.7.4',
-                'xvfbwrapper>=0.2.8'
+                'xvfbwrapper>=0.2.8',
+                'beautifulsoup4>=4.5.1',
+                'fake-factory>=0.5.10',
             ],
     license='MIT',
     url='https://github.com/matclab/pytest-web2py.wip',
@@ -44,6 +47,7 @@ setup(
                 'Topic :: Software Development :: Testing',
                 'Topic :: Software Development :: Libraries',
                 'Topic :: Utilities',
+                'Framework :: Pytest',
                 'Programming Language :: Python :: 2',
                 'Programming Language :: Python :: 2.7',
                 'Programming Language :: Python :: 3',

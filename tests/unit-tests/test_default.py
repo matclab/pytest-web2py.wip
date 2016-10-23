@@ -7,10 +7,12 @@ import re
 
 import pytest
 
-import conftest as w2p
+import pytest_web2py.unit.helper as w2p
 
-logging.config.fileConfig(os.path.join(w2p.app_directory, "logging.conf"))
-logger = logging.getLogger("web2py.test")
+
+
+logger = logging.getLogger("test_default")
+logger.addHandler(logging.NullHandler())
 logger.setLevel(logging.DEBUG)
 
 
@@ -18,23 +20,27 @@ logger.setLevel(logging.DEBUG)
 def controller():
     return 'default'
 
+@pytest.fixture()
+def is_local():
+    return True
 
 def describe_register():
     # Note that we use pytest-describe plugin to collect tests
 
-    def is_working_by_db(w, fr, register_and_login):
+
+    def is_working_by_db(w, register_and_login):
         assert w.session.auth and w.auth.is_logged_in()
-        assert w.recaptcha._validate.call_count == 1
 
     @pytest.mark.parametrize('gae_probability', [1])
-    def is_working_by_api(w, fr, user_data):
+    def is_working_by_api(w, user_data):
         assert not w.session.auth and not w.auth.is_logged_in()
         w2p.form_post(w, 'user/register', user_data,
                       redirect_controller='default', redirect_url='index')
         assert w.session.flash == 'Logged in'
 
-    @pytest.mark.parametrize('register_verification', [True])
-    def login_fail_until_registration_verified(w, fr, register_and_login, gae,
+    @pytest.mark.skip("Do not work on welcome app, as no mailer is set up")
+    @pytest.mark.parametrize('register_verification,is_local', [(True,False)])
+    def login_fail_until_registration_verified(w, register_and_login, gae,
                                                user_data, appname, controller):
         assert w.session.flash == 'Email sent'
 
@@ -66,8 +72,10 @@ def describe_register():
                           redirect_controller='object', redirect_url='objects')
         assert w.session.auth and w.auth.is_logged_in()
 
+
+    @pytest.mark.skip("Do not work on welcome app, as no mailer is set up")
     @pytest.mark.parametrize('register_verification', [True])
-    def check_email_content(w, fr, register_and_login, user_data, gae):
+    def check_email_content(w, register_and_login, user_data, gae):
         if gae and w.mail.settings.server[0] == 'gae':
             import google.appengine.api.mail
             assert google.appengine.api.mail.send_mail.call_count == 1
@@ -81,14 +89,9 @@ def describe_register():
             assert 'To: %s' % user_data['email'] in mail
         assert 'Click on the link http' in mail
 
-    @pytest.mark.parametrize('recaptcha_validate', [False])
-    def recaptcha_fail(w, fr, user_data):
-        w2p.form_post(w, 'user/register', user_data)
-        assert not w.session.auth and not w.auth.is_logged_in()
-        assert w.recaptcha._validate.call_count == 1
 
     @pytest.mark.parametrize('password_two', ['erroneous'])
-    def fail_when_erroneous_second_password(w, fr, user_data):
+    def fail_when_erroneous_second_password(w, user_data):
         r = w2p.form_post(w, 'user/register', user_data)
         assert r['form'].errors.password_two == "Password fields don't match"
         assert not w.session.auth
@@ -96,7 +99,7 @@ def describe_register():
 
 def describe_login():
 
-    def ok_after_register(w, fr, user_data):
+    def ok_after_register(w, user_data):
         assert not w.session.auth and not w.auth.is_logged_in()
         w2p.form_post(w, 'user/register', user_data,
                       redirect_controller='default', redirect_url='index')
@@ -105,33 +108,33 @@ def describe_login():
         assert w.session.auth.user.first_name == user_data['first_name']
         assert w.session.auth.user.email == user_data['email']
 
-    def fail_if_bad_user(w, fr, register_and_login, logout, user_data):
+    def fail_if_bad_user(w, register_and_login, logout, user_data):
         assert not w.session.auth
         user_data.update(email="a@b.com")
         w2p.form_post(w, 'user/login', user_data, redirect_url='user/login',
-                      redirect_controller='user')
+                      redirect_controller='default')
         assert not w.session.auth
         assert w.session.flash == 'Invalid login'
 
-    def fail_if_bad_password(w, fr, register_and_login, logout, user_data):
+    def fail_if_bad_password(w, register_and_login, logout, user_data):
         assert not w.session.auth
         user_data.update(password="blob")
         w2p.form_post(w, 'user/login', user_data, redirect_url='user/login',
-                      redirect_controller='user')
+                      redirect_controller='default')
         assert not w.session.auth
         assert w.session.flash == 'Invalid login'
 
 
 def describe_index():
-    def index_does_display(w, fr, db, controller):
+    def index_does_display(w, db, controller):
         html = w2p.call(w, 'index', controller=controller, render=True).html
         assert '>Home</a>' in html
-        assert 'button">Sign Up</a>' in html
-        assert 'button">Log In</a>' in html
+        assert 'Sign Up' in html
+        assert 'Log In' in html
 
-    def index_does_display_when_logged(w, fr, db, controller,
+    def index_does_display_when_logged(w, db, controller,
                                        register_and_login):
         html = w2p.call(w, 'index', controller=controller, render=True).html
         assert '>Home</a>' in html
-        assert 'button">Sign Up</a>' not in html
-        assert 'button">Log In</a>' not in html
+        assert 'Sign Up' not in html
+        assert 'Log In' not in html

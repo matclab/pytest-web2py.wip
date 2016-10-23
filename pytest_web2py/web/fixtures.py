@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
 import sys
-import urllib
-import urlparse
 
 import pytest
 from bs4 import BeautifulSoup
