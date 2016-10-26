@@ -15,6 +15,32 @@ logger.addHandler(logging.NullHandler())
 logger.setLevel(logging.DEBUG)
 
 
+@pytest.fixture(autouse=True, scope='session')
+def _0_configure_unit(appdir):
+    modules_path = os.path.normpath(os.path.join(appdir, 'modules'))
+    if modules_path not in sys.path:
+        sys.path.insert(0, modules_path)  # imports from app modules folder
+    site_path = os.path.normpath(os.path.join(appdir, 'site-packages'))
+    if site_path not in sys.path:
+        sys.path.append(site_path)  # imports from site-packages
+
+    # Configure paths for gae
+    if config.option.gae:
+        path = os.path.realpath(config.option.gae_sdk_path)
+        if path not in sys.path:
+            sys.path.insert(0, path)
+        import dev_appserver
+        dev_appserver.fix_sys_path(
+        )  # add paths to libs specified in app.yaml, etc
+        mute_noisy_tasklets()
+
+    os.chdir(config.option.w2p_root) # We want to be in web2py base repo
+    if not config.option.gae:
+        try:
+            import gluon  # Needed for sqlite, but prevent web2py to connect to gae datastore testbed
+        except ImportError:
+            config.warn('WC1', "Unable to import gluon. Please set up --w2p-root.")
+
 
 @pytest.fixture(scope='session')
 def fake():
