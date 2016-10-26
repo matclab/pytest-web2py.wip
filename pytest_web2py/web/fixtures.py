@@ -64,6 +64,9 @@ def module_client(url, request):
     return _client(url, request)
 
 @pytest.fixture(autouse=True)
-def emptydb(client):
+def emptydb(client, appname):
     logger.debug("-- emptydb")
-    client.get('/tests/empty_db')
+    try:
+        client.get('/%s/tests/empty_db' % appname)
+    except:
+        logger.warn('No "tests" controller in %s application' % appname)
