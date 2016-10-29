@@ -167,12 +167,10 @@ def summary_failures_with_teardonw(self):
                 self._outrep_summary(rep)
                 for report in self.getreports(''):
                     if report.nodeid == rep.nodeid and report.when == 'teardown':
-                        #self._outrep_summary(report)
                         self.print_teardown_sections(report)
 
 
 @pytest.hookimpl(tryfirst=True)
-#@pytest.mark.hookwrapper
 def pytest_terminal_summary(terminalreporter, exitstatus):
     terminalreporter.__class__.print_teardown_sections = print_teardown_sections
     terminalreporter.__class__.summary_failures = summary_failures_with_teardonw
