@@ -275,6 +275,8 @@ def w(appname, appdir, controller, request, gae, gaebed, mocker,
         return r
 
     web2py_env['run'] = run
+    current.cache.ram.clear()
+    current.cache.disk.clear()
 
     if hasattr(web2py_env, '__file__'):
         del web2py_env['__file__']  # avoid py.test import error
