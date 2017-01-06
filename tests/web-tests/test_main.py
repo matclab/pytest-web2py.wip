@@ -55,7 +55,7 @@ def test_register(client):
     debug(client)
     assert ('Welcome Homer' in client.text)
     logoutlink = client.dom.find(logout_in_a)['href']
-    assert logoutlink == '/welcome/default/user/logout'
+    assert logoutlink == '/welcome/default/user/logout?_next=/welcome/default/index'
     logger.debug("GET logout %s", logoutlink)
     client.get(logoutlink)
     loginlink = client.dom.find(text=" Log In").parent['href']
