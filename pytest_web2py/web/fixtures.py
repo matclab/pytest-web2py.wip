@@ -63,10 +63,20 @@ def module_client(url, request):
     logger.debug("-- module_client")
     return _client(url, request)
 
+@pytest.fixture()
+def test_controller():
+    '''Name of the controller containing helper controller for tests.
+
+    As of today, the only needed controller function for tests is `empty_db`
+    which shall truncate the DB before each tests.
+    '''
+    return 'tests'
+
 @pytest.fixture(autouse=True)
-def emptydb(client, appname):
+def emptydb(client, appname, test_controller):
     logger.debug("-- emptydb")
     try:
-        client.get('/%s/tests/empty_db' % appname)
+        client.get('/%s/%s/empty_db' % (appname, test_controller))
     except:
-        logger.warn('No "tests" controller in %s application' % appname)
+        logger.warn('No "%s/empty_db" controller in %s application' %
+                    (test_controller, appname))
