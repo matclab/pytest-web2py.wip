@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import urlparse
 from copy import copy
 
 logger = logging.getLogger("pytest_web2py")
@@ -9,7 +10,7 @@ logger.setLevel(logging.DEBUG)
 
 
 def call(w,
-         function_name,
+         url,
          status=None,
          redirect_url=None,
          next=None,
@@ -142,8 +143,9 @@ def call(w,
             logger.debug("redirect to: %s\nUser '%s'. Logged:%s", location,
                          w.auth.user, w.auth.is_logged_in())
         if check_status:
-        assert e.status == status, "status %s expected (%s found) for url '%s'" % (
-            status, e.status, url)
+            assert e.status == status,\
+                "status %s expected (%s found) for url '%s'" % ( status,
+                                                                e.status, url)
 
         if check_redirect:
             assert location == r_url, ("Wrong redirection url on %s() : %s "
@@ -168,7 +170,7 @@ def form_post(w,
               redirect_controller=None,
               next_controller=None,
               formname=None,
-              formkey=None):
+              formkey=None,
               check_redirect=True,
               check_status=True,
               **kwargs):
@@ -205,7 +207,7 @@ def form_post(w,
         next=next,
         controller=controller,
         redirect_controller=redirect_controller,
-        next_controller=next_controller)
+        next_controller=next_controller,
         check_redirect=check_redirect,
         check_status=check_status,
         **kwargs)

@@ -30,16 +30,16 @@ def _0_configure_unit(appdir):
         if path not in sys.path:
             sys.path.insert(0, path)
         import dev_appserver
-        dev_appserver.fix_sys_path(
-        )  # add paths to libs specified in app.yaml, etc
+        dev_appserver.fix_sys_path()  # add paths to libs specified in app.yaml, etc
         mute_noisy_tasklets()
 
-    os.chdir(config.option.w2p_root) # We want to be in web2py base repo
+    os.chdir(config.option.w2p_root)  # We want to be in web2py base repo
     if not config.option.gae:
         try:
             import gluon  # Needed for sqlite, but prevent web2py to connect to gae datastore testbed
         except ImportError:
-            config.warn('WC1', "Unable to import gluon. Please set up --w2p-root.")
+            config.warn('WC1',
+                        "Unable to import gluon. Please set up --w2p-root.")
 
 
 @pytest.fixture(scope='session')
@@ -57,24 +57,28 @@ def is_https():
     """ Used to set request.is_https """
     return True
 
+
 @pytest.fixture
 def is_local():
     """ Used to set request.is_local """
     return False
+
 
 @pytest.fixture
 def is_shell():
     """ Used to set request.is_shell """
     return False
 
+
 @pytest.fixture
 def is_scheduler():
     """ Used to set request.is_scheduler """
     return False
 
+
 @pytest.fixture()
 def prepare_db(w):
-    """ May be overwritte in tests to prepare the DB specifically after DB clean
+    """ May be overwritten in tests to prepare the DB specifically after DB clean
     up """
 
     def _prepare_db():
@@ -194,10 +198,31 @@ def taskqueue_stub(gaebed, gae):
         return None
 
 
+@pytest.fixture()
+def test_app_uuid():
+    '''UUID passed as an extra request argument, used to identify on the app
+    side that we are running in test mode.
+
+    That UUID shall be overwritten and specific to your app.
+    '''
+    return 'd2c84025-5e33-442d-db12-9da661250e2d'
+
+
+@pytest.fixture()
+def w(web2py_env):
+    '''A storageified web2py environment
+    Be careful that modification to w shall not be shared with the initial
+    environment. If you need to modify it afterway, better use the web2py_env
+    dict '''
+    from gluon.globals import Storage
+    return Storage(web2py_env)
+
+
 @pytest.fixture
-def w(appname, appdir, controller, request, gae, gaebed, mocker,
-      recaptcha_validate, register_verification, password_change_verification,
-      is_https, is_local, is_shell, is_scheduler, w2pdir, w2pversion):
+def web2py_env(appname, appdir, controller, request, gae, gaebed, mocker,
+               recaptcha_validate, register_verification,
+               password_change_verification, is_https, is_local, is_shell,
+               is_scheduler, w2pdir, w2pversion, language, test_app_uuid):
     '''
     Create a Web2py environment similar to that achieved by Web2py shell.
 
@@ -224,21 +249,22 @@ def w(appname, appdir, controller, request, gae, gaebed, mocker,
 
     # create databases dir if needed
     dbdir = os.path.join(appdir, 'databases')
-    if not gae and not  os.path.isdir(dbdir):
+    if not gae and not os.path.isdir(dbdir):
         os.mkdir(dbdir)
 
-    web2py_env = env(
-        appname,
-        c=controller,
-        import_models=True,
-        dir=appdir,
-        extra_request=dict(TEST_APP='d2c84025-5e33-442d-db12-9da661250e2d',
-                           is_local=is_local,
-                           is_https=is_https,
-                           is_scheduler=is_scheduler,
-                           is_shell=is_shell,
-                           folder=appdir + os.sep))
+    web2py_env = env(appname,
+                     c=controller,
+                     import_models=True,
+                     dir=appdir,
+                     extra_request=dict(
+                         TEST_APP=test_app_uuid,
+                         is_local=is_local,
+                         is_https=is_https,
+                         is_scheduler=is_scheduler,
+                         is_shell=is_shell,
+                         folder=appdir + os.sep))
 
+    web2py_env['T'].force(language)
     execfile(
         os.path.join(appdir, 'controllers', controller + '.py'), web2py_env)
     if 'auth' in web2py_env:
@@ -258,6 +284,7 @@ def w(appname, appdir, controller, request, gae, gaebed, mocker,
 
         web2py_env['request'].controller = c
         web2py_env['request'].function = f
+        web2py_env['request'].is_https = is_https
         r = None
         try:
             r = run_controller_in(c, f, web2py_env)
@@ -281,7 +308,6 @@ def w(appname, appdir, controller, request, gae, gaebed, mocker,
     if hasattr(web2py_env, '__file__'):
         del web2py_env['__file__']  # avoid py.test import error
 
-
     def fin():
         """ Close connection to allow openning another one later """
         if gae:
@@ -291,9 +317,7 @@ def w(appname, appdir, controller, request, gae, gaebed, mocker,
 
     request.addfinalizer(fin)
 
-    res = Storage(web2py_env)
-
-    return res
+    return web2py_env
 
 
 def _update_global_settings(gs, w2pversion, w2pdir, gae):
@@ -304,10 +328,6 @@ def _update_global_settings(gs, w2pversion, w2pdir, gae):
     if not gs.local_hosts:
         gs.local_hosts = ['127.0.0.1', '::ffff:127.0.0.1', '::1']
     gs.applications_parent = w2pdir
-
-
-
-
 
 
 @pytest.fixture()
@@ -353,7 +373,6 @@ def login(w, user_data):
     assert w.session.auth.user.last_name == user_data['last_name']
     assert w.session.auth.user.first_name == user_data['first_name']
     assert w.session.auth.user.email == user_data['email']
-
 
 
 @pytest.fixture()
@@ -421,11 +440,17 @@ def password_two(password):
 
 
 @pytest.fixture()
-def user_data(email, first_name, last_name, password, password_two):
+def language():
+    return 'en-us'
+
+
+@pytest.fixture()
+def user_data(email, first_name, last_name, password, password_two, language):
     return {
         'email': email,
         'first_name': first_name,
         'last_name': last_name,
         'password': password,
         'password_two': password_two,
+        'language': language,
     }
