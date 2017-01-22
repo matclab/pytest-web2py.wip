@@ -72,6 +72,11 @@ def call(w,
         if isinstance(value, list) and len(value) == 1:
             get_vars[key] = value[0]
 
+
+    extension = None
+    if '.' in function_part:
+        function_part, extension = function_part.rsplit('.', 1)
+
     args = function_part.split('/')
     function = args[0]
     w.request.vars.clear()
@@ -97,9 +102,13 @@ def call(w,
         r_url = ''
     if next:
         if next == True:
+
+            f = function
+            if extension:
+                f = '%s.%s' % (f, extension)
             r_url += '?_next=/%s/%s/%s' % (w.request.application,
                                            next_controller or controller,
-                                           function)
+                                           f)
             r = [r_url]
             r.extend(args[1:])
             r_url = '/'.join(r)
@@ -110,7 +119,7 @@ def call(w,
     try:
         logger.debug("→ Calling %s in %s", url, controller)
         from gluon.compileapp import run_controller_in
-        resp = w.run(function, controller)
+        resp = w.run(function, controller, extension)
         logger.debug("Flash s:%s r:%s", w.session.flash, w.response.flash)
         if check_redirect:
             assert r_url == '', ('Expected redirection to %s didn\'t occurred' % r_url)

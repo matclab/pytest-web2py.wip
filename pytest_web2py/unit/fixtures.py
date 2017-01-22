@@ -281,7 +281,7 @@ def web2py_env(appname, appdir, controller, request, gae, gaebed, mocker,
         web2py_env[
             'auth'].settings.reset_password_requires_verification = password_change_verification
 
-    def run(f, c=controller):
+    def run(f, c=controller, ext='html'):
         """Injects request.controller and request.function into
         web2py environment.
         :type f: str
@@ -292,6 +292,7 @@ def web2py_env(appname, appdir, controller, request, gae, gaebed, mocker,
 
         web2py_env['request'].controller = c
         web2py_env['request'].function = f
+        web2py_env['request'].extension = ext
         web2py_env['request'].is_https = is_https
         r = None
         try:
