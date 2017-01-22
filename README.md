@@ -96,7 +96,7 @@ def empty_db():
 
 ## Thanks
 
-Some code taken and inspiration taken from https://github.com/viniciusban/web2py.test
+Some code and inspiration taken from https://github.com/viniciusban/web2py.test
 
 
 ## Licence
@@ -105,12 +105,4 @@ To be defined, but probably something like MIT…
 
 ## TODO
 
-- make the API cleaner
-- separate things in a clean independent pytest plugin (obiously with some
-  more configuration w.r.t. web2py and applicatins paths),
-- write tests for the pytest-plugin,
-- document pytest usage,
-- document test writing (with pitfalls of unittest, use of mocks, …),
-- writing more web2py default tests,
-- improve code quality (break long functions,…)
-- …
+See the [github issues](https://github.com/matclab/pytest-web2py.wip/issues)
