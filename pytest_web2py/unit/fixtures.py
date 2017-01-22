@@ -252,6 +252,14 @@ def web2py_env(appname, appdir, controller, request, gae, gaebed, mocker,
     if not gae and not os.path.isdir(dbdir):
         os.mkdir(dbdir)
 
+    # We rewrite the request.env storage, so as to be able to set up the
+    # request.env.http_accept_language before call of model file.
+    request_env = Storage({
+        'http_accept_language' : language,
+        'http_host' : '127.0.0.1:8000',
+        'remote_addr': '127.0.0.1',
+        'web2py_runtime_gae': gae })
+
     web2py_env = env(appname,
                      c=controller,
                      import_models=True,
@@ -262,9 +270,9 @@ def web2py_env(appname, appdir, controller, request, gae, gaebed, mocker,
                          is_https=is_https,
                          is_scheduler=is_scheduler,
                          is_shell=is_shell,
+                         env= request_env,
                          folder=appdir + os.sep))
 
-    web2py_env['T'].force(language)
     execfile(
         os.path.join(appdir, 'controllers', controller + '.py'), web2py_env)
     if 'auth' in web2py_env:
