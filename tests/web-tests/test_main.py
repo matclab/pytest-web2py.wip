@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 import logging
 
+import pytest
+
+from pytest_web2py.web import *
+
 logger = logging.getLogger("web2py.test")
+logger.addHandler(logging.NullHandler())
 logger.setLevel(logging.DEBUG)
 
 
@@ -31,9 +36,11 @@ def debug(client):
 def test_register(client):
     client.get('/')
     # register
-    reglink = client.dom.find("a", class_="btn", text="Sign Up")['href']
+    reglink = client.dom.find(text=" Sign Up").parent['href']
+    assert reglink == '/welcome/default/user/register?_next=/welcome/default/index'
     logger.debug("GET register %s", reglink)
     client.get(reglink)
+    assert 'Confirm Password' in client.text
     dump_html(client)
     data = dict(
         first_name='Homer',
@@ -41,16 +48,17 @@ def test_register(client):
         email='homer@web2py.com',
         password='test',
         password_two='test',
-        _formname='register',
-        language='en-us')
+        _formname='register')
     logger.debug("POST register")
     client.post(reglink, data=data)
     dump_html(client, 1)
     debug(client)
-    logoutlink = '/user_/logout'
+    assert ('Welcome Homer' in client.text)
+    logoutlink = client.dom.find(logout_in_a)['href']
+    assert logoutlink == '/welcome/default/user/logout?_next=/welcome/default/index'
     logger.debug("GET logout %s", logoutlink)
     client.get(logoutlink)
-    loginlink = client.dom.find("a", class_="btn", text="Log In")['href']
+    loginlink = client.dom.find(text=" Log In").parent['href']
     debug(client)
 
     data = dict(email='homer@web2py.com', password='test', _formname='login')
