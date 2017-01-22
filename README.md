@@ -42,16 +42,16 @@ if TESTING:
    if UNIT_TESTING:
       # fast in memory SQL for unit test
       db = DAL('sqlite:memory:', lazy_tables=True
-	       )  #
+               )  #
    else:
       db = DAL('sqlite://storage.sqlite'
-	       , migrate_enabled=True
-	       , lazy_tables=True)  # sqlite for minimal persistence
+               , migrate_enabled=True
+               , lazy_tables=True)  # sqlite for minimal persistence
 else:
    db = DAL(myconf.get('db.uri'),
-	    pool_size=myconf.get('db.pool_size'),
-	    migrate_enabled=myconf.get('db.migrate'),
-	    check_reserved=['all'])
+            pool_size=myconf.get('db.pool_size'),
+            migrate_enabled=myconf.get('db.migrate'),
+            check_reserved=['all'])
 ```
 
 #### tests controller
@@ -63,7 +63,7 @@ may looks like:
 def empty_db():
    if TESTING:
       for t in db.tables:
-	 db[t].truncate('CASCADE')
+         db[t].truncate('CASCADE')
 ```
 
 
@@ -106,3 +106,5 @@ To be defined, but probably something like MIT…
 ## TODO
 
 See the [github issues](https://github.com/matclab/pytest-web2py.wip/issues)
+
+
